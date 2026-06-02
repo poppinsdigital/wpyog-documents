@@ -1,0 +1,417 @@
+/* ===================================================
+   WPYog Documents – Frontend Styles v1.3.9
+   =================================================== */
+
+.wpyog-doc-list,
+.wpyog-doc-box {
+  --wpyog-accent:       #4f46e5;
+  --wpyog-accent-light: #eef2ff;
+  --wpyog-text:         #1e293b;
+  --wpyog-muted:        #64748b;
+  --wpyog-border:       #e2e8f0;
+  --wpyog-bg:           #ffffff;
+  --wpyog-hover-bg:     #f8faff;
+  --wpyog-radius:       8px;
+  --wpyog-shadow:       0 1px 4px rgba(0,0,0,.07), 0 4px 12px rgba(0,0,0,.04);
+  --wpyog-icon-size:    36px;
+  --wpyog-row-gap:      14px;
+}
+
+/* ===================================================
+   Document List  [wpyog-document-list]
+   =================================================== */
+
+.wpyog-doc-list {
+  margin: 0 0 1.5em;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+.wpyog-doc-items {
+  list-style:   none !important;
+  margin:       0    !important;
+  padding:      0    !important;
+  background:   var(--wpyog-bg);
+  border:       1px solid var(--wpyog-border);
+  border-radius: var(--wpyog-radius);
+  box-shadow:   var(--wpyog-shadow);
+  overflow:     hidden;
+}
+
+/* ---- Row ---- */
+.wpyog-doc-item {
+  display:     flex        !important;
+  flex-wrap:   wrap;                    /* lets description drop to next line */
+  align-items: center      !important;  /* icon + title vertically centred    */
+  gap:         0 var(--wpyog-row-gap); /* row-gap=0, col-gap=14px            */
+  padding:     14px 18px;
+  border-bottom: 1px solid var(--wpyog-border);
+  position:    relative;
+  transition:  background 0.15s ease;
+}
+
+.wpyog-doc-item:last-child  { border-bottom: none; }
+.wpyog-doc-item:hover       { background: var(--wpyog-hover-bg); }
+
+/* accent left bar */
+.wpyog-doc-item::before {
+  content:    '';
+  position:   absolute;
+  left: 0; top: 0; bottom: 0;
+  width:      3px;
+  background: transparent;
+  transition: background 0.15s ease;
+}
+.wpyog-doc-item:hover::before { background: var(--wpyog-accent); }
+
+/* ---- Icon ---- */
+.wpyog-doc-item .wpyog-doc-icon {
+  flex-shrink: 0;
+  align-self:  center;
+  width:  var(--wpyog-icon-size) !important;
+  height: var(--wpyog-icon-size) !important;
+  display:         flex        !important;
+  align-items:     center;
+  justify-content: center;
+  background:  var(--wpyog-accent-light);
+  color:       var(--wpyog-accent);
+  border-radius: 7px;
+  font-size:   15px !important;
+  transition:  transform 0.15s ease;
+}
+.wpyog-doc-item:hover .wpyog-doc-icon { transform: scale(1.08); }
+
+/* colour-coded by file type */
+.wpyog-doc-item .fa-file-pdf-o          { background:#fef2f2!important; color:#dc2626!important; }
+.wpyog-doc-item .fa-file-word-o         { background:#eff6ff!important; color:#2563eb!important; }
+.wpyog-doc-item .fa-file-excel-o        { background:#f0fdf4!important; color:#16a34a!important; }
+.wpyog-doc-item .fa-file-powerpoint-o   { background:#fff7ed!important; color:#ea580c!important; }
+.wpyog-doc-item .fa-file-image-o        { background:#fdf4ff!important; color:#9333ea!important; }
+.wpyog-doc-item .fa-file-zip-o          { background:#fefce8!important; color:#ca8a04!important; }
+.wpyog-doc-item .fa-file-audio-o        { background:#fdf4ff!important; color:#7c3aed!important; }
+.wpyog-doc-item .fa-file-video-o        { background:#fff1f2!important; color:#e11d48!important; }
+.wpyog-doc-item .fa-file-text-o         { background:#f0f9ff!important; color:#0284c7!important; }
+.wpyog-doc-item .fa-file-o             { background:#f8fafc!important; color:#475569!important; }
+
+/* ---- Title row (icon sibling) ---- */
+.wpyog-doc-title {
+  flex:         1;
+  min-width:    0;        /* ← CRITICAL: prevents flex child from overflowing */
+  display:      flex;
+  flex-wrap:    nowrap;   /* keep title / download / date on one line          */
+  align-items:  center;
+  gap:          8px;
+}
+
+/* ---- Title link ---- */
+a.wpyog-doc-link,
+.wpyog-doc-link {
+  flex:           1;      /* ← takes remaining space, never squeezes to 0     */
+  min-width:      0;      /* ← allows text to wrap properly, not char-by-char  */
+  font-size:      0.925rem  !important;
+  font-weight:    600       !important;
+  color:          var(--wpyog-text) !important;
+  text-decoration: none     !important;
+  line-height:    1.4;
+  overflow-wrap:  break-word;
+  word-break:     break-word;
+  transition:     color 0.12s ease;
+}
+a.wpyog-doc-link:hover,
+.wpyog-doc-link:hover { color: var(--wpyog-accent) !important; }
+
+/* ---- Download button ---- */
+a.wpyog-doc-download,
+.wpyog-doc-download {
+  flex-shrink:     0;    /* never shrink */
+  display:         inline-flex !important;
+  align-items:     center;
+  justify-content: center;
+  width:  30px;
+  height: 30px;
+  background:      var(--wpyog-accent-light);
+  color:           var(--wpyog-accent) !important;
+  border-radius:   6px;
+  text-decoration: none         !important;
+  font-size:       13px;
+  transition:      background 0.15s, color 0.15s, transform 0.15s, box-shadow 0.15s;
+}
+a.wpyog-doc-download:hover,
+.wpyog-doc-download:hover {
+  background:  var(--wpyog-accent) !important;
+  color:       #ffffff             !important;
+  transform:   translateY(-1px);
+  box-shadow:  0 3px 8px rgba(79,70,229,.35);
+}
+
+/* ---- Date badge ---- */
+.wpyog-doc-date {
+  flex-shrink:  0;
+  font-size:    0.72rem  !important;
+  font-weight:  500;
+  color:        var(--wpyog-muted) !important;
+  background:   #f1f5f9;
+  padding:      2px 9px;
+  border-radius: 20px;
+  white-space:  nowrap;
+  line-height:  1.6;
+}
+
+/* ---- Description (wraps to full row below) ---- */
+.wpyog-doc-description {
+  flex:         0 0 100%;       /* full row; padding below stays inside width */
+  box-sizing:   border-box;
+  min-width:    0;
+  overflow-wrap: break-word;
+  word-break:   break-word;
+  padding-left: calc(var(--wpyog-icon-size) + var(--wpyog-row-gap));
+  margin-top:   8px;
+  padding-top:  8px;
+  border-top:   1px solid #f1f5f9;
+  font-size:    0.84rem;
+  color:        var(--wpyog-muted);
+  line-height:  1.6;
+}
+.wpyog-doc-description p { margin: 0 !important; padding: 0 !important; }
+
+/* ---- Empty state ---- */
+.wpyog-no-docs {
+  padding:    32px 20px !important;
+  text-align: center;
+  color:      var(--wpyog-muted);
+  font-size:  0.9rem;
+  background: #fafafa;
+}
+
+/* ===================================================
+   Single Document Box  [wpyog-document id=X]
+   =================================================== */
+
+.wpyog-doc-box {
+  background:    #ffffff;
+  border:        1px solid var(--wpyog-border);
+  border-left:   4px solid var(--wpyog-accent);
+  border-radius: var(--wpyog-radius);
+  padding:       16px 20px;
+  margin-bottom: 1em;
+  box-shadow:    var(--wpyog-shadow);
+  transition:    box-shadow 0.15s ease, transform 0.15s ease;
+  font-family:   -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+.wpyog-doc-box:hover {
+  box-shadow: 0 4px 16px rgba(79,70,229,.12);
+  transform:  translateY(-1px);
+}
+
+.wpyog-doc-box-title {
+  display:     flex;
+  align-items: center;
+  gap:         10px;
+}
+
+.wpyog-doc-box-title .wpyog-doc-icon {
+  flex-shrink:     0;
+  width:  34px !important;
+  height: 34px !important;
+  display:         flex        !important;
+  align-items:     center;
+  justify-content: center;
+  background:  var(--wpyog-accent-light);
+  color:       var(--wpyog-accent);
+  border-radius: 6px;
+  font-size:   15px !important;
+}
+
+/* file-type colours for single doc box */
+.wpyog-doc-box-title .fa-file-pdf-o        { background:#fef2f2; color:#dc2626; }
+.wpyog-doc-box-title .fa-file-word-o       { background:#eff6ff; color:#2563eb; }
+.wpyog-doc-box-title .fa-file-excel-o      { background:#f0fdf4; color:#16a34a; }
+.wpyog-doc-box-title .fa-file-powerpoint-o { background:#fff7ed; color:#ea580c; }
+.wpyog-doc-box-title .fa-file-image-o      { background:#fdf4ff; color:#9333ea; }
+.wpyog-doc-box-title .fa-file-zip-o        { background:#fefce8; color:#ca8a04; }
+
+.wpyog-doc-box-title a {
+  font-size:       1rem !important;
+  font-weight:     600  !important;
+  color:           var(--wpyog-text)  !important;
+  text-decoration: none               !important;
+  transition:      color 0.12s;
+  min-width:       0;
+  overflow-wrap:   break-word;
+}
+.wpyog-doc-box-title a:hover { color: var(--wpyog-accent) !important; }
+
+.wpyog-doc-box-content {
+  font-size:   0.875rem;
+  color:       var(--wpyog-muted);
+  line-height: 1.65;
+  padding-left: calc(34px + 10px); /* indent past icon */
+  margin-top:  6px;
+}
+.wpyog-doc-box-content p { margin: 0 !important; }
+
+/* ===================================================
+   Legacy fallback — #grid template (pre-1.3.8)
+   =================================================== */
+
+#grid { margin: 0 0 1.5em; }
+
+#grid ul {
+  list-style: none   !important;
+  margin:     0      !important;
+  padding:    0      !important;
+  border:     1px solid #e2e8f0;
+  border-radius: 8px;
+  overflow:   hidden;
+  box-shadow: 0 1px 4px rgba(0,0,0,.07);
+}
+
+#grid ul li.doc-material {
+  display:     flex       !important;
+  align-items: center;
+  gap:         10px;
+  padding:     13px 18px;
+  border-bottom: 1px solid #e2e8f0;
+  font-size:   0.9rem;
+  list-style:  none   !important;
+  transition:  background 0.15s;
+}
+#grid ul li.doc-material::before,
+#grid ul li.doc-material::marker { display: none !important; content: none !important; }
+#grid ul li.doc-material:last-child { border-bottom: none; }
+#grid ul li.doc-material:hover      { background: #f8faff; }
+
+#grid ul li.doc-material a.read-more-link {
+  flex:            1;
+  min-width:       0;
+  color:           #1e293b !important;
+  text-decoration: none    !important;
+  font-weight:     500;
+  font-size:       0.9rem;
+  overflow-wrap:   break-word;
+}
+#grid ul li.doc-material a.read-more-link:hover { color: #4f46e5 !important; }
+#grid ul li.doc-material .fa.fa-download { color: #4f46e5; font-size: 13px; }
+#grid ul li.doc-material .entry-date {
+  font-size:    0.72rem;
+  color:        #64748b;
+  background:   #f1f5f9;
+  padding:      2px 8px;
+  border-radius: 20px;
+}
+
+/* ===================================================
+   Responsive
+   =================================================== */
+
+@media (max-width: 640px) {
+  :root {
+    --wpyog-icon-size: 30px;
+    --wpyog-row-gap:   10px;
+  }
+  .wpyog-doc-item         { padding: 12px 14px; }
+  .wpyog-doc-item .wpyog-doc-icon { font-size: 13px !important; }
+  a.wpyog-doc-link,
+  .wpyog-doc-link         { font-size: 0.875rem !important; }
+  .wpyog-doc-box-content  { padding-left: 0; margin-top: 8px; }
+  a.wpyog-doc-download,
+  .wpyog-doc-download     { width: 28px; height: 28px; }
+}
+
+/* ===================================================
+   Multi-column layout  [wpyog-document-list columns=N]
+   =================================================== */
+
+.wpyog-cols-2 .wpyog-doc-items,
+.wpyog-cols-3 .wpyog-doc-items,
+.wpyog-cols-4 .wpyog-doc-items {
+  display: grid;
+  border-radius: var(--wpyog-radius);
+  overflow: hidden;
+}
+
+.wpyog-cols-2 .wpyog-doc-items { grid-template-columns: repeat(2, 1fr); }
+.wpyog-cols-3 .wpyog-doc-items { grid-template-columns: repeat(3, 1fr); }
+.wpyog-cols-4 .wpyog-doc-items { grid-template-columns: repeat(4, 1fr); }
+
+/* Grid cells */
+.wpyog-cols-2 .wpyog-doc-item,
+.wpyog-cols-3 .wpyog-doc-item,
+.wpyog-cols-4 .wpyog-doc-item {
+  min-width:    0;
+  align-items:  flex-start;
+  border-right: 1px solid var(--wpyog-border);
+}
+
+/* Title row wraps in narrow columns */
+.wpyog-cols-2 .wpyog-doc-title,
+.wpyog-cols-3 .wpyog-doc-title,
+.wpyog-cols-4 .wpyog-doc-title {
+  flex-wrap: wrap;
+}
+
+/* Title link wraps cleanly */
+.wpyog-cols-2 a.wpyog-doc-link,
+.wpyog-cols-3 a.wpyog-doc-link,
+.wpyog-cols-4 a.wpyog-doc-link {
+  overflow-wrap: break-word;
+  word-break:    break-word;
+  max-width:     100%;
+}
+
+/* Remove right border on last item in each row */
+.wpyog-cols-2 .wpyog-doc-item:nth-child(2n) { border-right: none; }
+.wpyog-cols-3 .wpyog-doc-item:nth-child(3n) { border-right: none; }
+.wpyog-cols-4 .wpyog-doc-item:nth-child(4n) { border-right: none; }
+
+/* ===================================================
+   Responsive
+   =================================================== */
+
+/* Tablet: 3 and 4 columns drop to 2 */
+@media (max-width: 900px) {
+  .wpyog-cols-3 .wpyog-doc-items,
+  .wpyog-cols-4 .wpyog-doc-items {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+  .wpyog-cols-3 .wpyog-doc-item:nth-child(3n),
+  .wpyog-cols-4 .wpyog-doc-item:nth-child(4n) { border-right: 1px solid var(--wpyog-border); }
+  .wpyog-cols-3 .wpyog-doc-item:nth-child(2n),
+  .wpyog-cols-4 .wpyog-doc-item:nth-child(2n) { border-right: none; }
+}
+
+/* Mobile: all layouts collapse to 1 column */
+@media (max-width: 768px) {
+  .wpyog-doc-item {
+    padding: 12px 14px;
+    gap: 0 10px;
+  }
+  .wpyog-doc-item .wpyog-doc-icon {
+    width:  30px !important;
+    height: 30px !important;
+    font-size: 13px !important;
+    flex-shrink: 0;
+  }
+  a.wpyog-doc-link,
+  .wpyog-doc-link { font-size: 0.875rem !important; }
+
+  a.wpyog-doc-download,
+  .wpyog-doc-download { width: 26px; height: 26px; }
+
+  .wpyog-doc-description {
+    padding-left: calc(30px + 10px); /* match smaller icon on mobile */
+  }
+
+  .wpyog-doc-box-content { padding-left: 0; margin-top: 8px; }
+
+  /* All multi-column → single column on mobile */
+  .wpyog-cols-2 .wpyog-doc-items,
+  .wpyog-cols-3 .wpyog-doc-items,
+  .wpyog-cols-4 .wpyog-doc-items {
+    grid-template-columns: 1fr !important;
+  }
+  .wpyog-cols-2 .wpyog-doc-item,
+  .wpyog-cols-3 .wpyog-doc-item,
+  .wpyog-cols-4 .wpyog-doc-item {
+    border-right: none !important;
+  }
+}
