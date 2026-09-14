@@ -4,8 +4,8 @@ Contributors: wpyog
 Donate link: https://poppinsdigital.com/
 Tags: documents, document management, pdf, file download, document library
 Requires at least: 5.0
-Tested up to: 7.0
-Stable tag: 1.5.0
+Tested up to: 7.1
+Stable tag: 1.5.1
 Requires PHP: 7.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -88,6 +88,12 @@ Yes. The shortcode works in any editor or page builder that supports WordPress s
 
 == Changelog ==
 
+= 1.5.1 =
+Bug Fixes
+
+* Fixed Plugin Check slow query warning — added phpcs:ignore for tax_query (required for taxonomy-based category filtering; no alternative approach exists in WP_Query).
+* Updated "Tested up to" to WordPress 7.1 to ensure the plugin appears in WordPress.org search results.
+
 = 1.5.0 =
 New Features
 
@@ -155,6 +161,9 @@ Code Quality / Security
 * Added sanitize function for the text input field.
 
 == Upgrade Notice ==
+
+= 1.5.1 =
+Minor fix — updates "Tested up to" to WordPress 7.1 and resolves Plugin Check warnings. Safe to update.
 
 = 1.5.0 =
 Major update — new column layout, Shortcode Generator, full CSS redesign, and multiple bug fixes. Fully backward compatible. Safe to update.

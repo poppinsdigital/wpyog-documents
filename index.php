@@ -5,7 +5,7 @@
  * Description: A complete document management solution for WordPress — upload, categorize, and publish files with secure downloads, category filters, and a flexible shortcode.
  * Author:      poppinsdigital.com
  * Author URI:  https://poppinsdigital.com/
- * Version:     1.5.0
+ * Version:     1.5.1
  * License:     GPLv2 or later
  * License URI: http://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain: wpyog-documents
@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'WPYOG_DOCUMENTS_VERSION', '1.5.0' );
+define( 'WPYOG_DOCUMENTS_VERSION', '1.5.1' );
 
 if ( ! defined( 'WPYOG_RESEARCH_PLUGIN_DIR' ) ) {
 	define( 'WPYOG_RESEARCH_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
@@ -481,6 +481,7 @@ function wpyog_research_document_list( $atts, $content = null ) {
 	);
 
 	if ( ! empty( $cat ) ) {
+		// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query
 		$args['tax_query'] = array(
 			array(
 				'taxonomy' => 'wpyog_document_category',
