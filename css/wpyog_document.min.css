@@ -415,3 +415,43 @@ a.wpyog-doc-download:hover,
     border-right: none !important;
   }
 }
+
+/* ===================================================
+   Pagination  [wpyog-document-list pagination="1"]
+   Note: WordPress adds .page-numbers to the <ul> too, so the
+   container is reset explicitly and only the items are styled.
+   =================================================== */
+.wpyog-doc-pagination { margin: 18px 0 0; }
+
+.wpyog-doc-pagination ul.page-numbers {
+  display: flex !important; flex-wrap: wrap; gap: 6px; justify-content: center;
+  list-style: none !important; margin: 0 !important; padding: 0 !important;
+  border: 0 !important; background: none !important; box-shadow: none !important;
+  min-width: 0 !important; height: auto !important; border-radius: 0 !important;
+}
+.wpyog-doc-pagination ul.page-numbers > li {
+  margin: 0 !important; padding: 0 !important; list-style: none !important;
+  border: 0 !important; background: none !important;
+}
+
+.wpyog-doc-pagination ul.page-numbers > li > a.page-numbers,
+.wpyog-doc-pagination ul.page-numbers > li > span.page-numbers {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 2.3rem; height: 2.3rem; padding: 0 .65rem; box-sizing: border-box;
+  border: 1px solid transparent; border-radius: 6px;
+  background: var(--wpyog-bg, #fff); color: var(--wpyog-text, #1e293b);
+  font-size: .875rem; font-weight: 500; line-height: 1; text-decoration: none;
+  box-shadow: 0 1px 2px rgba(0,0,0,.08);
+  transition: background .15s, color .15s;
+}
+/* Hover only on the item itself, never on the list container */
+.wpyog-doc-pagination ul.page-numbers > li > a.page-numbers:hover,
+.wpyog-doc-pagination ul.page-numbers > li > a.page-numbers:focus {
+  background: var(--wpyog-accent-light, #eef2ff); color: var(--wpyog-accent, #4f46e5);
+}
+.wpyog-doc-pagination ul.page-numbers > li > span.page-numbers.current {
+  background: var(--wpyog-accent, #4f46e5); color: #fff;
+}
+.wpyog-doc-pagination ul.page-numbers > li > span.page-numbers.dots {
+  background: transparent; box-shadow: none;
+}

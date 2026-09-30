@@ -9,6 +9,8 @@
  *   $date     int  1 = show date
  *   $download int  1 = show download button
  *   $columns  int  number of columns (1–4)
+ *   $wpyog_pagination_html string pagination markup (already escaped), may be empty
+ *   $wpyog_instance int list instance number on the page
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -17,7 +19,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 $wpyog_cols_class = ( $columns > 1 ) ? ' wpyog-cols-' . intval( $columns ) : '';
 ?>
-<div class="wpyog-doc-list<?php echo esc_attr( $wpyog_cols_class ); ?>" role="region" aria-label="<?php esc_attr_e( 'Document list', 'wpyog-documents' ); ?>">
+<div id="wpyog-docs-<?php echo esc_attr( isset( $wpyog_instance ) ? $wpyog_instance : 1 ); ?>" class="wpyog-doc-list<?php echo esc_attr( $wpyog_cols_class ); ?>" role="region" aria-label="<?php esc_attr_e( 'Document list', 'wpyog-documents' ); ?>">
 	<ul class="wpyog-doc-items">
 		<?php if ( $query->have_posts() ) : ?>
 			<?php while ( $query->have_posts() ) : $query->the_post(); ?>
@@ -67,4 +69,9 @@ $wpyog_cols_class = ( $columns > 1 ) ? ' wpyog-cols-' . intval( $columns ) : '';
 			</li>
 		<?php endif; ?>
 	</ul>
+	<?php
+	if ( ! empty( $wpyog_pagination_html ) ) {
+		echo wp_kses_post( $wpyog_pagination_html );
+	}
+	?>
 </div>

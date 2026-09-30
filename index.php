@@ -5,7 +5,7 @@
  * Description: A complete document management solution for WordPress — upload, categorize, and publish files with secure downloads, category filters, and a flexible shortcode.
  * Author:      poppinsdigital.com
  * Author URI:  https://poppinsdigital.com/
- * Version:     1.5.1
+ * Version:     1.5.2
  * License:     GPLv2 or later
  * License URI: http://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain: wpyog-documents
@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'WPYOG_DOCUMENTS_VERSION', '1.5.1' );
+define( 'WPYOG_DOCUMENTS_VERSION', '1.5.2' );
 
 if ( ! defined( 'WPYOG_RESEARCH_PLUGIN_DIR' ) ) {
 	define( 'WPYOG_RESEARCH_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
@@ -157,7 +157,7 @@ function wpyog_document_ref_page_callback() {
 							</td>
 						</tr>
 						<tr>
-							<th><label for="sc-limit"><?php esc_html_e( 'Limit', 'wpyog-documents' ); ?></label></th>
+							<th><label for="sc-limit"><?php esc_html_e( 'Limit / per page', 'wpyog-documents' ); ?></label></th>
 							<td><input type="number" id="sc-limit" value="" min="1" max="999" placeholder="<?php esc_attr_e( 'Show all', 'wpyog-documents' ); ?>" style="width:110px;" oninput="wpyogBuild()"></td>
 						</tr>
 						<tr>
@@ -179,7 +179,8 @@ function wpyog_document_ref_page_callback() {
 							<td>
 								<label style="display:block;margin-bottom:6px;"><input type="checkbox" id="sc-desc" onchange="wpyogBuild()"> <?php esc_html_e( 'Show description', 'wpyog-documents' ); ?></label>
 								<label style="display:block;margin-bottom:6px;"><input type="checkbox" id="sc-date" onchange="wpyogBuild()"> <?php esc_html_e( 'Show date', 'wpyog-documents' ); ?></label>
-								<label style="display:block;"><input type="checkbox" id="sc-download" onchange="wpyogBuild()"> <?php esc_html_e( 'Show download button', 'wpyog-documents' ); ?></label>
+								<label style="display:block;margin-bottom:6px;"><input type="checkbox" id="sc-download" onchange="wpyogBuild()"> <?php esc_html_e( 'Show download button', 'wpyog-documents' ); ?></label>
+								<label style="display:block;"><input type="checkbox" id="sc-pagination" onchange="wpyogBuild()"> <?php esc_html_e( 'Enable pagination (Limit = documents per page)', 'wpyog-documents' ); ?></label>
 							</td>
 						</tr>
 					</tbody>
@@ -255,6 +256,7 @@ function wpyog_document_ref_page_callback() {
 			var dsc = document.getElementById('sc-desc').checked;
 			var dat = document.getElementById('sc-date').checked;
 			var dl  = document.getElementById('sc-download').checked;
+			var pg  = document.getElementById('sc-pagination').checked;
 			if ( cat )            sc += ' category="' + cat + '"';
 			if ( col !== '1' )    sc += ' columns="' + col + '"';
 			if ( lim !== '' )     sc += ' limit="' + lim + '"';
@@ -263,6 +265,7 @@ function wpyog_document_ref_page_callback() {
 			if ( dsc )            sc += ' desc="1"';
 			if ( dat )            sc += ' date="1"';
 			if ( dl )             sc += ' download="1"';
+			if ( pg )             sc += ' pagination="1"';
 			sc += ']';
 			document.getElementById('sc-output').textContent = sc;
 			document.getElementById('sc-copied').style.display = 'none';
@@ -441,6 +444,15 @@ add_action( 'manage_wpyog_document_posts_custom_column', function ( $column_name
 // Shortcode: [wpyog-document-list]
 // -------------------------------------------------------------------------
 
+/**
+ * Returns a 1-based counter for each list rendered on the page, so several
+ * paginated lists can live on one page without sharing a page number.
+ */
+function wpyog_next_list_instance() {
+	static $count = 0;
+	return ++$count;
+}
+
 add_shortcode( 'wpyog-document-list', 'wpyog_research_document_list' );
 function wpyog_research_document_list( $atts, $content = null ) {
 	// Flag that frontend assets are needed.
@@ -456,6 +468,7 @@ function wpyog_research_document_list( $atts, $content = null ) {
 			'limit'    => -1,
 			'download' => 0,
 			'columns'  => 1,
+			'pagination' => 0,
 		),
 		$atts,
 		'wpyog-document-list'
@@ -470,6 +483,17 @@ function wpyog_research_document_list( $atts, $content = null ) {
 	$download = intval( $atts['download'] );
 	$columns  = max( 1, min( 4, intval( $atts['columns'] ) ) );
 
+	// Pagination: `limit` becomes the number of documents per page (default 10).
+	$pagination = 1 === intval( $atts['pagination'] );
+	$instance   = wpyog_next_list_instance();
+	$page_param = ( 1 === $instance ) ? 'wpyog_page' : 'wpyog_page_' . $instance;
+	$paged      = 1;
+	if ( $pagination ) {
+		$limit = ( $limit > 0 ) ? $limit : 10;
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only page number, no state change.
+		$paged = isset( $_GET[ $page_param ] ) ? max( 1, absint( wp_unslash( $_GET[ $page_param ] ) ) ) : 1;
+	}
+
 	$cat = ! empty( $category ) ? array_map( 'intval', explode( ',', $category ) ) : array();
 
 	$args = array(
@@ -478,7 +502,12 @@ function wpyog_research_document_list( $atts, $content = null ) {
 		'posts_per_page' => $limit,
 		'orderby'        => $orderby,
 		'order'          => $order,
+		'no_found_rows'  => ! $pagination,
 	);
+
+	if ( $pagination ) {
+		$args['paged'] = $paged;
+	}
 
 	if ( ! empty( $cat ) ) {
 		// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query
@@ -492,6 +521,38 @@ function wpyog_research_document_list( $atts, $content = null ) {
 	}
 
 	$query = new WP_Query( $args );
+
+	$wpyog_pagination_html = '';
+	if ( $pagination && $query->max_num_pages > 1 ) {
+		$request_uri = isset( $_SERVER['REQUEST_URI'] ) ? esc_url_raw( wp_unslash( $_SERVER['REQUEST_URI'] ) ) : '';
+		$base_url    = remove_query_arg( $page_param, $request_uri );
+		$links       = paginate_links(
+			array(
+				'base'         => add_query_arg( $page_param, '%#%', $base_url ),
+				'format'       => '',
+				'current'      => $paged,
+				'total'        => (int) $query->max_num_pages,
+				'prev_text'    => __( '&larr; Previous', 'wpyog-documents' ),
+				'next_text'    => __( 'Next &rarr;', 'wpyog-documents' ),
+				'type'         => 'list',
+			)
+		);
+		if ( $links ) {
+			$wpyog_pagination_html = '<nav class="wpyog-doc-pagination" aria-label="' . esc_attr__( 'Document pagination', 'wpyog-documents' ) . '">' . $links . '</nav>';
+		}
+	}
+	$wpyog_instance = $instance;
+
+	// Links carry no #fragment: Divi's smooth-scroll handler cancels navigation on same-page
+	// links that contain a hash. Bring the list back into view with a tiny script instead.
+	if ( $pagination && $paged > 1 ) {
+		wp_register_script( 'wpyog-doc-scroll', false, array(), WPYOG_DOCUMENTS_VERSION, true );
+		wp_enqueue_script( 'wpyog-doc-scroll' );
+		wp_add_inline_script(
+			'wpyog-doc-scroll',
+			'(function(){var e=document.getElementById("wpyog-docs-' . (int) $instance . '");if(e&&e.scrollIntoView){e.scrollIntoView({block:"start"});}})();'
+		);
+	}
 
 	ob_start();
 	include plugin_dir_path( __FILE__ ) . 'templates/research-document-list.php';
@@ -610,7 +671,37 @@ function wpyog_enqueue_front_scripts() {
 	$enqueued = true;
 
 	wp_enqueue_style( 'wpyog_font_awesome_css', plugin_dir_url( __FILE__ ) . 'css/font-awesome.min.css', array(), WPYOG_DOCUMENTS_VERSION );
-	wp_enqueue_style( 'wpyog_document_front_css', plugin_dir_url( __FILE__ ) . 'css/wpyog_document.min.css', array(), WPYOG_DOCUMENTS_VERSION );
+	$wpyog_css_file = plugin_dir_path( __FILE__ ) . 'css/wpyog_document.min.css';
+	$wpyog_css_ver  = file_exists( $wpyog_css_file ) ? WPYOG_DOCUMENTS_VERSION . '.' . filemtime( $wpyog_css_file ) : WPYOG_DOCUMENTS_VERSION;
+	wp_enqueue_style( 'wpyog_document_front_css', plugin_dir_url( __FILE__ ) . 'css/wpyog_document.min.css', array(), $wpyog_css_ver );
+}
+
+/**
+ * Page builders (Divi visual builder, Elementor editor/preview) render the
+ * shortcode via AJAX, so the lazy enqueue never reaches the page. Load the
+ * assets up front while a builder is active.
+ */
+add_action( 'wp_enqueue_scripts', 'wpyog_enqueue_builder_assets' );
+function wpyog_enqueue_builder_assets() {
+	$in_builder = false;
+
+	// Divi 4 / Divi 5 visual builder.
+	if ( function_exists( 'et_core_is_fb_enabled' ) && et_core_is_fb_enabled() ) {
+		$in_builder = true;
+	}
+	// phpcs:disable WordPress.Security.NonceVerification.Recommended -- read-only builder detection flags.
+	if ( isset( $_GET['et_fb'] ) || isset( $_GET['elementor-preview'] ) ) {
+		$in_builder = true;
+	}
+	// phpcs:enable WordPress.Security.NonceVerification.Recommended
+	// Elementor preview mode.
+	if ( class_exists( '\Elementor\Plugin' ) && isset( \Elementor\Plugin::$instance->preview ) && \Elementor\Plugin::$instance->preview->is_preview_mode() ) {
+		$in_builder = true;
+	}
+
+	if ( $in_builder ) {
+		wpyog_enqueue_front_scripts();
+	}
 }
 
 add_filter( 'widget_text', 'do_shortcode' );

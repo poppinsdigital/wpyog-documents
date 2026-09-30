@@ -5,7 +5,7 @@ Donate link: https://poppinsdigital.com/
 Tags: documents, document management, pdf, file download, document library
 Requires at least: 5.0
 Tested up to: 7.1
-Stable tag: 1.5.1
+Stable tag: 1.5.2
 Requires PHP: 7.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -37,6 +37,7 @@ Place this shortcode on any post or page to list documents. Available attributes
 * `order` — sort direction. `DESC` or `ASC`. Example: `[wpyog-document-list order="ASC"]`
 * `download` — show/hide download button. `1` = show, `0` = hide. Example: `[wpyog-document-list download="1"]`
 * `limit` — maximum number of documents to show. Example: `[wpyog-document-list limit="5"]`
+* `pagination` — set to `1` to split the list into pages. `limit` then sets the documents per page (default 10). Example: `[wpyog-document-list limit="10" pagination="1"]`
 * `columns` — number of columns (1–4). Default is 1. Example: `[wpyog-document-list columns="2"]`
 
 To display a single document, use the `[wpyog-document]` shortcode:
@@ -87,6 +88,14 @@ Yes. The shortcode works in any editor or page builder that supports WordPress s
 6. Category Document List (Frontend) — filtered list with date badge, download button, and description.
 
 == Changelog ==
+
+= 1.5.2 =
+* New: pagination. Add `pagination="1"` to `[wpyog-document-list]` and use `limit` as documents per page. Works with several lists on one page.
+* New: pagination option in the Shortcode Generator.
+* Fixed: pagination links now work inside Divi 5 (page links no longer carry a #fragment, which Divi's smooth scroll intercepted).
+* Pagination CSS uses its own `wpyog-doc-pagination` class so it does not clash with other WPYog plugins.
+* Improved: frontend styles now load inside the Divi visual builder and Elementor editor preview.
+* Checked: classic editor, block editor (Shortcode block), Elementor Shortcode widget, Divi 4 and Divi 5 code/text modules.
 
 = 1.5.1 =
 Bug Fixes
@@ -161,6 +170,9 @@ Code Quality / Security
 * Added sanitize function for the text input field.
 
 == Upgrade Notice ==
+
+= 1.5.2 =
+Adds pagination (`pagination="1"`) and builder compatibility improvements. Safe to update.
 
 = 1.5.1 =
 Minor fix — updates "Tested up to" to WordPress 7.1 and resolves Plugin Check warnings. Safe to update.
