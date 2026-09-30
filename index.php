@@ -5,7 +5,7 @@
  * Description: A complete document management solution for WordPress — upload, categorize, and publish files with secure downloads, category filters, and a flexible shortcode.
  * Author:      poppinsdigital.com
  * Author URI:  https://poppinsdigital.com/
- * Version:     1.5.2
+ * Version:     1.5.4
  * License:     GPLv2 or later
  * License URI: http://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain: wpyog-documents
@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'WPYOG_DOCUMENTS_VERSION', '1.5.2' );
+define( 'WPYOG_DOCUMENTS_VERSION', '1.5.4' );
 
 if ( ! defined( 'WPYOG_RESEARCH_PLUGIN_DIR' ) ) {
 	define( 'WPYOG_RESEARCH_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
@@ -421,7 +421,16 @@ function wpyog_save_document_meta_data( $post_id, $post ) {
 		return;
 	}
 
-	$document_link = ! empty( $_POST['document_link'] ) ? sanitize_text_field( wp_unslash( $_POST['document_link'] ) ) : '';
+	$document_link = ! empty( $_POST['document_link'] ) ? esc_url_raw( wp_unslash( $_POST['document_link'] ) ) : '';
+
+	// Security: reject any document_link that does not originate from this site's uploads directory.
+	if ( ! empty( $document_link ) ) {
+		$upload_dirs = wp_upload_dir();
+		if ( strpos( $document_link, $upload_dirs['baseurl'] ) !== 0 ) {
+			$document_link = '';
+		}
+	}
+
 	update_post_meta( $post_id, 'document_link', $document_link );
 }
 
@@ -774,22 +783,51 @@ function wpyog_download_file() {
 		wp_die( esc_html__( 'Invalid document', 'wpyog-documents' ) );
 	}
 
+	// Security fix 7.0: verify the post is a published wpyog_document before serving it.
+	$post = get_post( $post_id );
+	if ( ! $post || 'wpyog_document' !== $post->post_type || 'publish' !== $post->post_status ) {
+		wp_die( esc_html__( 'Document not found', 'wpyog-documents' ), '', array( 'response' => 404 ) );
+	}
+
 	$document_link = get_post_meta( $post_id, 'document_link', true );
 
 	if ( empty( $document_link ) ) {
 		wp_die( esc_html__( 'File not found', 'wpyog-documents' ) );
 	}
 
-	$filename    = basename( $document_link );
 	$upload_dirs = wp_upload_dir();
-	$relative    = str_replace( $upload_dirs['baseurl'], '', $document_link );
-	$physical    = $upload_dirs['basedir'] . $relative;
 
-	if ( ! file_exists( $physical ) ) {
+	// Security fix 8.5: reject any stored link that does not originate from the uploads base URL.
+	if ( strpos( $document_link, $upload_dirs['baseurl'] ) !== 0 ) {
+		wp_die( esc_html__( 'Invalid file path', 'wpyog-documents' ), '', array( 'response' => 403 ) );
+	}
+
+	$filename = basename( $document_link );
+	// Sanitize filename for use in Content-Disposition header: strip CRLF and quotes that could inject extra headers.
+	$filename = str_replace( array( "\r", "\n", '"', "'" ), '', $filename );
+	if ( empty( $filename ) ) {
+		$filename = 'document';
+	}
+
+	$relative = str_replace( $upload_dirs['baseurl'], '', $document_link );
+	$physical = $upload_dirs['basedir'] . $relative;
+
+	// Security fix 8.5: resolve symlinks/traversal and confirm the path remains inside uploads.
+	$real_physical    = realpath( $physical );
+	$real_uploads_dir = realpath( $upload_dirs['basedir'] );
+
+	if ( false === $real_physical || false === $real_uploads_dir ||
+		strpos( $real_physical, trailingslashit( $real_uploads_dir ) ) !== 0 ) {
+		wp_die( esc_html__( 'Invalid file path', 'wpyog-documents' ), '', array( 'response' => 403 ) );
+	}
+
+	if ( ! file_exists( $real_physical ) ) {
 		wp_die( esc_html__( 'File not found', 'wpyog-documents' ) );
 	}
 
-	$mime_type = mime_content_type( $physical );
+	$mime_type = mime_content_type( $real_physical );
+	// Restrict mime type to safe characters only to prevent header injection.
+	$mime_type = preg_replace( '/[^a-zA-Z0-9\-\/+.]/', '', $mime_type ? $mime_type : '' );
 	if ( empty( $mime_type ) ) {
 		$mime_type = 'application/octet-stream';
 	}
@@ -800,10 +838,10 @@ function wpyog_download_file() {
 	header( 'Expires: 0' );
 	header( 'Cache-Control: must-revalidate' );
 	header( 'Pragma: public' );
-	header( 'Content-Length: ' . filesize( $physical ) );
+	header( 'Content-Length: ' . filesize( $real_physical ) );
 	flush();
 	// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_read_readfile, WordPress.WP.AlternativeFunctions.file_system_operations_readfile
-	readfile( $physical );
+	readfile( $real_physical );
 	exit;
 }
 

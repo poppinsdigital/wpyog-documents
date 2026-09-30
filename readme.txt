@@ -5,7 +5,7 @@ Donate link: https://poppinsdigital.com/
 Tags: documents, document management, pdf, file download, document library
 Requires at least: 5.0
 Tested up to: 7.1
-Stable tag: 1.5.2
+Stable tag: 1.5.4
 Requires PHP: 7.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -89,6 +89,18 @@ Yes. The shortcode works in any editor or page builder that supports WordPress s
 
 == Changelog ==
 
+= 1.5.4 =
+Security
+
+* Hardened download handler: sanitized filename used in Content-Disposition header to strip CRLF and quote characters that could enable header injection.
+* Hardened download handler: sanitized MIME type string with a character allowlist before writing it into the Content-Type header.
+
+= 1.5.3 =
+Security
+
+* Fixed path traversal vulnerability in the file download handler — the resolved file path is now verified to remain within the WordPress uploads directory using realpath(). Stored document links that do not originate from the uploads base URL are also rejected at save time and at download time.
+* Fixed unauthenticated access to unpublished documents — the download handler now verifies the requested post is a published wpyog_document before serving the file.
+
 = 1.5.2 =
 * New: pagination. Add `pagination="1"` to `[wpyog-document-list]` and use `limit` as documents per page. Works with several lists on one page.
 * New: pagination option in the Shortcode Generator.
@@ -170,6 +182,12 @@ Code Quality / Security
 * Added sanitize function for the text input field.
 
 == Upgrade Notice ==
+
+= 1.5.4 =
+Security hardening: header injection prevention in the file download handler. Recommended update.
+
+= 1.5.3 =
+Security release. Fixes path traversal and unpublished document disclosure vulnerabilities in the file download handler. Update immediately.
 
 = 1.5.2 =
 Adds pagination (`pagination="1"`) and builder compatibility improvements. Safe to update.
